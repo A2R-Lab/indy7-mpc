@@ -17,12 +17,8 @@ def rk4(model, data, q, v, u, dt):    #model: pin.Model, data is pin.Data
     q_next = pin.integrate(model, q, avg_v * dt)
     return q_next, v_next
 
-def load_robot_model(urdf_path):
-    model = pin.buildModelFromUrdf(urdf_path)
-    visual_model = pin.buildGeomFromUrdf(model, urdf_path, pin.GeometryType.VISUAL)
-    collision_model = pin.buildGeomFromUrdf(model, urdf_path, pin.GeometryType.COLLISION)
-    
-    return model, visual_model, collision_model
+def load_robot_model(urdf_path, mesh_dir):
+    return pin.buildModelsFromUrdf(urdf_path, mesh_dir)
 
 def print_stats(stats):
     for task, stat in stats.items():
