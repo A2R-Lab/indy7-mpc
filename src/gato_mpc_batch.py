@@ -102,10 +102,10 @@ class MPC_GATO_Batch:
     
         current_goal_idx = 0
         time_accumulated = 0.0 
-        sim_dt = 0.002  # hard coded timestep for now, realistically should be trajopt solver time
+        sim_dt = 0.005  # hard coded timestep for now, realistically should be trajopt solver time
         num_steps = int(sim_time / sim_dt)
         
-        print(f"Running MPC with {num_steps} steps, dt: {sim_dt}")
+        print(f"Running MPC with {num_steps} steps, sim_dt: {sim_dt}")
         print("Endpoints:")
         print(endpoints)
         
