@@ -102,7 +102,7 @@ class MPC_GATO_Batch:
     
         current_goal_idx = 0
         time_accumulated = 0.0 
-        sim_dt = 0.005  # hard coded timestep for now, realistically should be trajopt solver time
+        sim_dt = 0.01  # hard coded timestep for now, realistically should be trajopt solver time
         num_steps = int(sim_time / sim_dt)
         
         print(f"Running MPC with {num_steps} steps, sim_dt: {sim_dt}")
@@ -115,6 +115,8 @@ class MPC_GATO_Batch:
                 
             # Optimize trajectory
             self.solver.reset()
+            #self.solver.solver.resetRho()
+            #self.solver.solver.resetLambda()
             
             start_time = time.time()
             XU_batch_new = self.solver.solve(xcur_batch, eepos_goal_batch, XU_batch)
@@ -153,7 +155,7 @@ class MPC_GATO_Batch:
                 stats['solve_times'].append(float(round(end_time - start_time, 5)))
             
             # Check if current goal is reached and update to next goal
-            if goaldist < 0.05 and current_goal_idx < len(endpoints) - 1:
+            if goaldist < 0.12 and current_goal_idx < len(endpoints) - 1:
                 current_goal_idx += 1
                 endpoint = endpoints[current_goal_idx]
                 endpoint = np.hstack([endpoint, np.zeros(3)])
@@ -161,7 +163,7 @@ class MPC_GATO_Batch:
                 eepos_goal = np.expand_dims(eepos_goal, axis=0)
                 eepos_goal_batch = np.tile(eepos_goal, (self.solver.batch_size, 1))
                 print(f"Reached intermediate goal {current_goal_idx}, moving to next goal: {endpoint}")
-            elif goaldist < 0.05 and current_goal_idx == len(endpoints) - 1:
+            elif goaldist < 0.12 and current_goal_idx == len(endpoints) - 1:
                 print(f"Reached final goal {current_goal_idx}")
                 break
             
