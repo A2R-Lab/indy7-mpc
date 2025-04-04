@@ -5,6 +5,8 @@ from utils import rk4
 class MPC_OSQP:
     def __init__(self, model, sqp_optimizer, solver):
         self.model = model
+        self.model.gravity = pin.Motion.Zero()
+        self.model.gravity.linear = np.array([0, 0, -9.81])
         self.sqp_optimizer = sqp_optimizer
         self.solver = solver
         self.xpath = []  # Store trajectory for visualization
