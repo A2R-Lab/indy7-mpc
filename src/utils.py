@@ -1,17 +1,17 @@
 import pinocchio as pin
 
-def rk4(model, data, q, v, u, dt):    #model: pin.Model, data is pin.Data
+def rk4(model, data, q, v, u, dt, f_ext):  
     k1q = v
-    k1v = pin.aba(model, data, q, v, u)
+    k1v = pin.aba(model, data, q, v, u, f_ext)
     q2 = pin.integrate(model, q, k1q * dt / 2)
     k2q = v + k1v * dt/2
-    k2v = pin.aba(model, data, q2, k2q, u)
+    k2v = pin.aba(model, data, q2, k2q, u, f_ext)
     q3 = pin.integrate(model, q, k2q * dt / 2)
     k3q = v + k2v * dt/2
-    k3v = pin.aba(model, data, q3, k3q, u)
+    k3v = pin.aba(model, data, q3, k3q, u, f_ext)
     q4 = pin.integrate(model, q, k3q * dt)
     k4q = v + k3v * dt
-    k4v = pin.aba(model, data, q4, k4q, u)
+    k4v = pin.aba(model, data, q4, k4q, u, f_ext)
     v_next = v + (dt/6) * (k1v + 2*k2v + 2*k3v + k4v)
     avg_v = (k1q + 2*k2q + 2*k3q + k4q) / 6
     q_next = pin.integrate(model, q, avg_v * dt)
