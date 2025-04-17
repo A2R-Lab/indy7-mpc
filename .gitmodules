@@ -1,0 +1,3 @@
+[submodule "indy7-sdk"]
+	path = indy7-sdk
+	url = git@github.com:A2R-Lab/indy7-sdk.git
