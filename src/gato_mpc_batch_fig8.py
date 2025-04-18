@@ -276,10 +276,10 @@ class MPC_GATO_Batch_Sample:
             world_force = pin.Force(f_ext[:3], f_ext[3:])
             
             # Transform force from world frame to joint's local frame
-            #  local_force = data.oMi[6].actInv(world_force)
+            local_force = data.oMi[6].actInv(world_force)
             
             # Add the transformed force to the last joint
-            forces.append(world_force)
+            forces.append(local_force)
             
             q, v = rk4(model, data, x_last[:self.nq], x_last[self.nq:self.nx], u_last, dt, forces)
             x_next = np.hstack([q, v])
