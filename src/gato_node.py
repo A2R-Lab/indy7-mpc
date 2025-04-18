@@ -7,14 +7,20 @@ import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import JointState
 from geometry_msgs.msg import Wrench
-from mpc.mpc.reference_traj import figure_8
+from batch_solver import GATO_Batch_Solver
 
-class GATO_Controller(Node):
+
+# timeout duration for joint state subscriber
+JOINT_STATE_TIMEOUT = 10.0
+# interval for saving statistics (in seconds)
+STATS_SAVE_INTERVAL = 35.0
+
+class GATO_Node(Node):
     def __init__(self, ref_traj=None, batch_size=1, N=32, dt=0.01, 
                  f_ext_std=0.0, f_ext_resample_std=0.0, 
                  f_ext_actual=None):
         
-        super().__init__('gato_controller')
+        super().__init__('GATO_Node')
         
         if ref_traj is None:
             raise ValueError("ref_traj must be provided")
@@ -38,7 +44,7 @@ class GATO_Controller(Node):
         self.ctrl_msg.position = [0.0] * 6 
         self.ctrl_msg.velocity = [0.0] * 6
         
-        self.solver = GATO_Batch_Sample(self.N, self.dt, self.batch_size, f_ext_std=f_ext_std, f_ext_resample_std=f_ext_resample_std)
+        self.solver = GATO_Batch_Solver(self.N, self.dt, self.batch_size, f_ext_std=f_ext_std, f_ext_resample_std=f_ext_resample_std)
 
         f_ext_actual = f_ext_actual if f_ext_actual is not None else np.zeros(3)
         self.send_external_force(f_ext_actual)
@@ -116,10 +122,11 @@ class GATO_Controller(Node):
         self.XU_batch[:,:] = self.XU_best
         self.x_last, self.u_last = x_curr, u_curr
         
+        print(f"tracking err: {tracking_error:.4f}")
         print(f"best idx: {best_idx}  ----- f_ext: {[f'{x:.4f}' for x in self.solver.f_ext_batch[best_idx][:3]]}")
-        print(f"q: {[f'{x:.4f}' for x in x_curr[:6]]}")
-        print(f"u: {[f'{x:.4f}' for x in u_curr]}")
-        print(f"time elapsed: {elapsed_time:.4f}s")
+        print(f"q: {[f'{x:.2f}' for x in x_curr[:6]]}")
+        print(f"u: {[f'{x:.2f}' for x in u_curr]}")
+        print(f"time elapsed: {elapsed_time:.3f}s")
         print("\n--------------------------------\n")
         
     def send_external_force(self, force):
@@ -200,7 +207,7 @@ def main(args=None):
         
         # # ----- 64 BATCH SAMPLE CONFIG -----
 
-        gato_controller = GATO_Controller(ref_traj=ref_traj, batch_size=16, N=N, dt=dt,
+        gato_controller = GATO_Controller(ref_traj=ref_traj, batch_size=32, N=N, dt=dt,
                                           f_ext_std=20.0, f_ext_resample_std=1.0, 
                                           f_ext_actual=f_ext_actual)
         

@@ -3,32 +3,19 @@ import torch
 import sys 
 import os
 
-#sys.path.append('./src')
-sys.path.append('../../../../../') # to get bindings TODO: move to setup.py
+sys.path.append('../../')
 import bindings.batch_sqp as batch_sqp
 
-np.random.seed(42)
-# timeout duration for joint state subscriber
-JOINT_STATE_TIMEOUT = 10.0
-# interval for saving statistics (in seconds)
-# TODO: make this configurable
-STATS_SAVE_INTERVAL = 35.0
 
-class GATO_Batch_Sample:
+class GATO_Batch_Solver:
     def __init__(self, N=32, dt=0.01, batch_size=4, stats=None, f_ext_std=1.0, f_ext_resample_std=0.0):
         self.N = N
         self.dt = dt
         
         solver_map = {
             1: batch_sqp.SQPSolverfloat_1,
-            2: batch_sqp.SQPSolverfloat_2,
-            4: batch_sqp.SQPSolverfloat_4,
-            8: batch_sqp.SQPSolverfloat_8,
-            16: batch_sqp.SQPSolverfloat_16,
             32: batch_sqp.SQPSolverfloat_32,
-            64: batch_sqp.SQPSolverfloat_64,
-            128: batch_sqp.SQPSolverfloat_128,
-            256: batch_sqp.SQPSolverfloat_256
+            64: batch_sqp.SQPSolverfloat_64
         }
         if batch_size not in solver_map:
             raise ValueError(f"Batch size {batch_size} not supported")
@@ -38,9 +25,9 @@ class GATO_Batch_Sample:
         
         self.stats = stats or {
             'solve_time': {'values': [], 'unit': 'us', 'multiplier': 1},
-            'sqp_iters': {'values': [], 'unit': '', 'multiplier': 1},
             'pcg_iters': {'values': [], 'unit': '', 'multiplier': 1},
-            "step_size": {"values": [], "unit": "", "multiplier": 1}
+            "step_size": {"values": [], "unit": "", "multiplier": 1},
+            'sqp_iters': {'values': [], 'unit': '', 'multiplier': 1}
         }
 
         if f_ext_std != 0.0:
@@ -94,7 +81,7 @@ class GATO_Batch_Sample:
             self.f_ext_batch[best_idx, :] = f_ext_best
             self.f_ext_batch[:, 3:] = 0.0
             self.f_ext_batch[0] = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-            self.f_ext_batch *= 0.97
+            self.f_ext_batch *= 0.98
             self.solver.set_external_wrench_batch(self.f_ext_batch)
 
     def reset(self):

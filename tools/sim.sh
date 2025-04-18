@@ -13,4 +13,4 @@ fi
 echo "--------------------------------"
 echo "Running Indy7 MuJoCo simulator..."
 echo "--------------------------------"
-ros2 launch sim sim.launch.py
+ros2 run mujoco_sim mujoco_sim_node $(pwd)/description/indy7.xml 0.01 false # no viz

@@ -1,20 +1,20 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>sim</name>
-  <version>0.0.0</version>
-  <description>MuJoCo simulation for Neuromeka Indy7</description>
-  <maintainer email="alexander.du@columbia.edu">adu</maintainer>
+  <name>mujoco_sim</name>
+  <version>0.0.1</version>
+  <description>MuJoCo simulation package for Indy7 robot</description>
+  <maintainer email="alexander.du@columbia.edu">Alex Du</maintainer>
   <license>MIT</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <depend>mujoco</depend>
   <depend>rclcpp</depend>
-  <depend>sensor_msgs</depend>
   <depend>geometry_msgs</depend>
-
-  <!-- GLFW is dependency when visualization is enabled -->
+  <depend>sensor_msgs</depend>
+  <depend>mujoco</depend>
+  
+  <!-- GLFW is an optional dependency for visualization -->
   <build_depend condition="$ENABLE_VISUALIZATION == 'ON'">glfw3</build_depend>
   <exec_depend condition="$ENABLE_VISUALIZATION == 'ON'">glfw3</exec_depend>
 
