@@ -2,17 +2,15 @@
 
 MPC with the Indy7 manipulator
 
-In `indy7-sdk/`:
-
+MuJoCo Simulation
 ```bash
-./docker.sh
-./make-viz.sh # with visualization
-./make-noviz.sh # without viz
-./run_sim.sh
+./tools/make-viz # with visualization
+./tools/make-noviz.sh # without viz
+./sim.sh # run the simulation
+./clean.sh
 ```
 
-Then in `indy7-mpc/`:
-
+GATO controller node
 ```bash
-python3 gato_controller.py
+python3 run.py
 ```
