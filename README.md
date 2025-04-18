@@ -2,12 +2,17 @@
 
 MPC with the Indy7 manipulator
 
-[uv](https://docs.astral.sh/uv/) is used as a Python package and project manager.
-
-To install dependencies and setup:
+In `indy7-sdk/`:
 
 ```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
-uv sync
-source .venv/bin/activate
+./docker.sh
+./make-viz.sh # with visualization
+./make-noviz.sh # without viz
+./run_sim.sh
+```
+
+Then in `indy7-mpc/`:
+
+```bash
+python3 gato_controller.py
 ```
