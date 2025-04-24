@@ -26,6 +26,11 @@ class MPC_OSQP:
         XU = np.zeros(self.solver.N*(nx+nu)-nu)
         XU = self.sqp_optimizer.sqp(xcur, eepos_goal, XU)
         
+        
+        self.constant_f_ext = pin.StdVec_Force()
+        for _ in range(self.model.njoints):
+            self.constant_f_ext.append(pin.Force.Zero())
+        
         for i in range(num_steps):
             # Check if we need to switch goals
             cur_eepos = self.solver.eepos(xcur[:nq])
@@ -53,7 +58,7 @@ class MPC_OSQP:
             while sim_time > 0:
                 timestep = min(sim_time, self.solver.dt)
                 control = XU[sim_steps*(nx+nu)+nx:(sim_steps+1)*(nx+nu)]
-                xcur = np.vstack(rk4(self.model, self.solver.data, xcur[:nq], xcur[nq:nx], control, timestep)).reshape(-1)
+                xcur = np.vstack(rk4(self.model, self.solver.data, xcur[:nq], xcur[nq:nx], control, timestep, self.constant_f_ext)).reshape(-1)
                 
                 if timestep > 0.5 * self.solver.dt:
                     sim_steps += 1

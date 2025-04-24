@@ -16,22 +16,8 @@ def main(args=None):
     np.random.seed(42)
     try:
         rclpy.init(args=args)
-        dt = 0.01
-        N = 64
-        
-        # ----- REFERENCE TRAJECTORY -----
-        ref_traj = figure_8(x_amplitude=0.5, z_amplitude=0.55, 
-                            offset=[0.0, 0.4, 0.45], 
-                            timestep=dt, 
-                            period=10, 
-                            num_periods=10, 
-                            angle_offset=np.pi/4)
-        
-        padding = np.tile(ref_traj[0:6], 200)
-        ref_traj = np.concatenate([padding, ref_traj])
-        
-        # ----- EXTERNAL FORCE -----
-        f_ext_actual = [-60.0, 20.0, -40.0]
+        dt = 0.02
+        N = 32
         
         # # ----- Single solver -----
         
@@ -47,9 +33,8 @@ def main(args=None):
         
         # ----- 64 BATCH -----
 
-        gato_node = GATO_Node(ref_traj=ref_traj, batch_size=64, N=N, dt=dt,
-                                          f_ext_std=20.0, f_ext_resample_std=1.0, 
-                                          f_ext_actual=f_ext_actual)
+        gato_node = GATO_Node(batch_size=64, N=N, dt=dt,
+                                          f_ext_std=10.0, f_ext_resample_std=0.2)
         
         # ---------------
         

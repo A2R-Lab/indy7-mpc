@@ -5,48 +5,40 @@ project(mujoco_sim)
 cmake_policy(SET CMP0072 NEW)
 set(OpenGL_GL_PREFERENCE GLVND)
 
-# Option to enable/disable visualization
-option(ENABLE_VISUALIZATION "Enable MuJoCo visualization with GLFW" ON)
+# # Option to enable/disable visualization
+# option(ENABLE_VISUALIZATION "Enable MuJoCo visualization with GLFW" ON)
 
-# Set environment variable for package.xml conditions
-set(ENV{ENABLE_VISUALIZATION} ${ENABLE_VISUALIZATION})
+# # Set environment variable for package.xml conditions
+# set(ENV{ENABLE_VISUALIZATION} ${ENABLE_VISUALIZATION})
 
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
-find_package(mujoco REQUIRED)
 find_package(geometry_msgs REQUIRED)
-# Only find GLFW if visualization is enabled
-if(ENABLE_VISUALIZATION)
-  find_package(glfw3 REQUIRED)
-  add_definitions(-DENABLE_VISUALIZATION)
-endif()
+find_package(mujoco REQUIRED HINTS /usr/local)
+find_package(glfw3 REQUIRED)
 
-add_executable(mujoco_sim_node src/mujoco_sim_node.cpp)
-target_compile_features(mujoco_sim_node PUBLIC c_std_99 cxx_std_17) 
 
-target_include_directories(mujoco_sim_node PUBLIC
+add_executable(sim_node src/sim_node.cpp)
+target_compile_features(sim_node PUBLIC c_std_99 cxx_std_17) 
+
+target_include_directories(sim_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
 )
 
-target_link_libraries(mujoco_sim_node
+target_link_libraries(sim_node
   mujoco::mujoco
+  glfw
 )
 
-# Only link GLFW if visualization is enabled
-if(ENABLE_VISUALIZATION)
-  target_link_libraries(mujoco_sim_node
-    glfw
-  )
-endif()
-
-ament_target_dependencies(mujoco_sim_node
+ament_target_dependencies(sim_node
   rclcpp
   sensor_msgs
+  geometry_msgs
 )
 
-install(TARGETS mujoco_sim_node
+install(TARGETS sim_node
   DESTINATION lib/${PROJECT_NAME}
 )
 

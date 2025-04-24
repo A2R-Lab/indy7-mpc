@@ -1,0 +1,31 @@
+path: "stats/apr21/"
+
+mpc:
+  solver: GATO_Batch_Solver
+  batch_size: 1
+  horizon: 32
+  dt: 0.01
+  f_ext_std: 2.0
+  f_ext_resample_std: 0.1
+
+oracle:
+  stats_save_period: 30.0
+
+  f_ext_update_period: 10.0
+  f_ext_actual: [-30.0, 10.0, -30.0]
+  f_ext_update_std: 0.0
+  f_ext_max: 100.0
+
+  ref_traj:
+    x_amplitude: 0.4
+    z_amplitude: 0.5
+    offset: [0.0, 0.4, 0.45]
+    timestep: 0.01
+    period: 10
+    num_periods: 10
+    angle_offset: 0 #np.pi/4
+
+mujoco_sim:
+  enable_visualization: true
+  sim_timestep: 0.01
+  model_path: "examples/indy7-mpc/description/indy7.xml"

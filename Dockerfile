@@ -5,7 +5,7 @@ FROM ros:humble-ros-base
 # CUDA
 COPY --from=cuda /usr/local/cuda /usr/local/cuda
 ENV PATH=/usr/local/cuda/bin:${PATH}
-ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64:${LD_LIBRARY_PATH}
+#ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64:${LD_LIBRARY_PATH}
 
 # environment variables
 ENV DEBIAN_FRONTEND=noninteractive
@@ -74,6 +74,7 @@ WORKDIR /workspace
 # source ROS environment in bash
 RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
 RUN echo "[ -f /workspace/install/setup.bash ] && source /workspace/install/setup.bash" >> ~/.bashrc
+RUN echo "[ -f /workspace/.venv/bin/activate ] && source /workspace/.venv/bin/activate" >> ~/.bashrc
 
 # command to run when container starts
 CMD ["/bin/bash"]

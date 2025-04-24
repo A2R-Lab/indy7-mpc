@@ -3,7 +3,7 @@
 <package format="3">
   <name>mujoco_sim</name>
   <version>0.0.1</version>
-  <description>MuJoCo simulation package for Indy7 robot</description>
+  <description>MuJoCo simulation package for MPC of the Indy7 manipulator</description>
   <maintainer email="alexander.du@columbia.edu">Alex Du</maintainer>
   <license>MIT</license>
 
@@ -13,10 +13,7 @@
   <depend>geometry_msgs</depend>
   <depend>sensor_msgs</depend>
   <depend>mujoco</depend>
-  
-  <!-- GLFW is an optional dependency for visualization -->
-  <build_depend condition="$ENABLE_VISUALIZATION == 'ON'">glfw3</build_depend>
-  <exec_depend condition="$ENABLE_VISUALIZATION == 'ON'">glfw3</exec_depend>
+  <depend>glfw3</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
