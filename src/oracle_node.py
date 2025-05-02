@@ -2,7 +2,7 @@ import numpy as np
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Float64MultiArray, Float64
-from reference_traj import figure_8
+from utils import figure_8
 from geometry_msgs.msg import Wrench, PointStamped, Point, Vector3
 from sensor_msgs.msg import JointState
 import time
@@ -12,7 +12,7 @@ import os
 
 class OracleNode(Node):
     def __init__(self, N=32, dt=0.02, f_ext_update_std=0.0, f_ext_max=100.0):
-        super().__init__('traj_oracle_node')
+        super().__init__('oracle_node')
         self.N = N
         self.dt = dt
         self.traj_pub = self.create_publisher(Float64MultiArray, '/ee_ref_traj', 1)
@@ -28,8 +28,9 @@ class OracleNode(Node):
         # Generate reference trajectory 
         self.ref_traj = figure_8(
             x_amplitude=0.4, z_amplitude=0.5,
-            offset=[0.0, 0.6, 0.5],
-            timestep=dt, period=10, num_periods=10, angle_offset=np.pi/4
+            pos_offset=[0.0, 0.6, 0.5],
+            timestep=dt, period=10, num_periods=10, 
+            theta=np.pi/4, axis='z'
         )
         padding = np.tile(self.ref_traj[0:6], 200)
         self.ref_traj = np.concatenate([padding, self.ref_traj])
@@ -139,7 +140,7 @@ class OracleNode(Node):
         current_time = time.time()
         if len(self.tracking_errors) == 0:
             return
-        timestamp = time.strftime("%Y%m%d_%H%M%S")
+        timestamp = time.strftime("%H%M%S")
         base_filename = os.path.join("stats/", f"oracle_{timestamp}")
         np.save(f"{base_filename}_tracking_errors.npy", np.array(self.tracking_errors))
         np.save(f"{base_filename}_ee_positions.npy", np.array(self.ee_positions))
@@ -148,13 +149,13 @@ class OracleNode(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    node = OracleNode()
+    oracle_node = OracleNode()
     try:
-        rclpy.spin(node)
+        rclpy.spin(oracle_node)
     except KeyboardInterrupt:
         pass
     finally:
-        node.destroy_node()
+        oracle_node.destroy_node()
         rclpy.shutdown()
 
 if __name__ == '__main__':

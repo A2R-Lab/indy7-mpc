@@ -6,24 +6,15 @@ import os
 sys.path.append('../../')
 import bindings.batch_sqp as batch_sqp
 
-
-class GATO_Batch_Solver:
-    def __init__(self, N=32, dt=0.01, batch_size=4, stats=None, f_ext_std=1.0, f_ext_resample_std=0.0):
-        self.N = N
-        self.dt = dt
+class GatoBatchSolver:
+    def __init__(self, config_path, f_ext_std=1.0, f_ext_resample_std=0.0):
+        self.config = yaml.load(open(config_path))
+        self.solver = batch_sqp.SQPSolverfloat()
+        self.N = self.config['solver']['N_horizon']
+        self.dt = self.config['solver']['dt']
+        self.batch_size = self.config['solver']['N_batch']
         
-        solver_map = {
-            1: batch_sqp.SQPSolverfloat_1,
-            32: batch_sqp.SQPSolverfloat_32,
-            64: batch_sqp.SQPSolverfloat_64
-        }
-        if batch_size not in solver_map:
-            raise ValueError(f"Batch size {batch_size} not supported")
-        
-        self.batch_size = batch_size
-        self.solver = solver_map[batch_size]()
-        
-        self.stats = stats or {
+        self.stats = {
             'solve_time': {'values': [], 'unit': 'us', 'multiplier': 1},
             'pcg_iters': {'values': [], 'unit': '', 'multiplier': 1},
             "step_size": {"values": [], "unit": "", "multiplier": 1},
@@ -46,9 +37,9 @@ class GATO_Batch_Solver:
         self.solver.set_external_wrench_batch(self.f_ext_batch)
 
         
-    def solve(self, xcur_batch, eepos_goals_batch, XU_batch):
+    def solve(self, XU_batch, x_0_batch, ref_traj_batch):
         
-        result = self.solver.solve(XU_batch, self.dt, xcur_batch, eepos_goals_batch)
+        result = self.solver.solve(XU_batch, x_0_batch, ref_traj_batch)
         self.stats['solve_time']['values'].append(result["solve_time_us"])
         self.stats['sqp_iters']['values'].append(result["sqp_iterations"])
         for i in range(len(result["pcg_stats"])):
@@ -88,10 +79,10 @@ class GATO_Batch_Solver:
         self.solver.reset()
         
     def reset_lambda(self):
-        self.solver.resetLambda()
+        self.solver.reset_lambda()
     
     def reset_rho(self):
-        self.solver.resetRho()
+        self.solver.reset_rho()
         
     def get_stats(self):
         return self.stats

@@ -9,9 +9,9 @@ import numpy as np
 from collections import deque
 import matplotlib.gridspec as gridspec # Import gridspec
 
-class RealtimePlotterNode(Node):
+class PlotterNode(Node):
     def __init__(self, max_points=100): 
-        super().__init__('realtime_plotter_node')
+        super().__init__('plotter_node')
         self.max_points = max_points
 
         # Data storage using deques for efficient appending and popping
@@ -121,7 +121,7 @@ class RealtimePlotterNode(Node):
         # Timer for updating plots - might be smoother than updating in every callback
         self.plot_update_timer = self.create_timer(0.05, self.update_plots) # Update ~20 Hz
 
-        self.get_logger().info(f"Realtime Plotter Node started. Listening for data...")
+        self.get_logger().info(f"Plotter Node started. Listening for data...")
 
     def error_callback(self, msg):
         self.errors.append(msg.data)
@@ -334,11 +334,11 @@ class RealtimePlotterNode(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    plotter_node = RealtimePlotterNode()
+    plotter_node = PlotterNode()
     try:
         rclpy.spin(plotter_node)
     except KeyboardInterrupt:
-        plotter_node.get_logger().info("Shutting down Realtime Plotter...")
+        plotter_node.get_logger().info("Shutting down Plotter...")
     finally:
         plotter_node.destroy_node()
         rclpy.shutdown()

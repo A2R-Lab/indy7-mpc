@@ -3,6 +3,7 @@
 #include <mutex>
 #include <string>
 #include <vector>
+#include <cstdint>
 #include <stdexcept>
 #include <GLFW/glfw3.h>
 #include <mujoco/mujoco.h>
@@ -15,7 +16,7 @@
 class Sim_node : public rclcpp::Node {
 public:
     Sim_node(std::string model_path, double sim_timestep, bool enable_visualization) 
-        : Node("sim"), 
+        : Node("sim_node"), 
           sim_timestep_(sim_timestep),
           enable_visualization_(enable_visualization) {
         
@@ -216,7 +217,7 @@ private:
         external_force_[2] = msg->force.z;
         apply_external_force_ = true;
         
-        RCLCPP_INFO(rclcpp::get_logger("sim"), "Received external force: [%f, %f, %f]",
+        RCLCPP_INFO(rclcpp::get_logger("sim_node"), "Received external force: [%f, %f, %f]",
                     external_force_[0], external_force_[1], external_force_[2]);
 
         applyExternalForce();
@@ -230,7 +231,7 @@ private:
         state_msg_->header.stamp = ee_pos_msg_->header.stamp = current_sim_time_;
 
         // Copy joint state data
-        for (unsigned int i = 0; i < model_->nv; i++) {
+        for (uint32_t int i = 0; i < model_->nv; i++) {
             state_msg_->position[i] = data_->qpos[i];
             state_msg_->velocity[i] = data_->qvel[i];
             state_msg_->effort[i] = data_->ctrl[i];
@@ -260,7 +261,7 @@ private:
         mjtNum torque[3] = {0, 0, 0}; // No torque applied
         mj_applyFT(model_, data_, force_local, torque, pos, ee_body_id_, data_->qfrc_applied);
 
-        RCLCPP_INFO(rclcpp::get_logger("sim"), "Applied force: %.4f %.4f %.4f on end effector!", force[0], force[1], force[2]);
+        RCLCPP_INFO(rclcpp::get_logger("sim_node"), "Applied force: %.4f %.4f %.4f on end effector!", force[0], force[1], force[2]);
     }
 
 
@@ -286,7 +287,7 @@ int main(int argc, char* argv[]) {
     
     // Parse command line arguments
     if (argc < 3) {
-        RCLCPP_ERROR(rclcpp::get_logger("sim"), 
+        RCLCPP_ERROR(rclcpp::get_logger("sim_node"), 
                      "Usage: %s <model_path> <sim_timestep> [enable_visualization]", argv[0]);
         return 1;
     }
@@ -301,7 +302,7 @@ int main(int argc, char* argv[]) {
         enable_visualization = (vis_flag == "true" || vis_flag == "1");
     }
     
-    RCLCPP_INFO(rclcpp::get_logger("sim"), 
+    RCLCPP_INFO(rclcpp::get_logger("sim_node"), 
                 "Starting MuJoCo simulation with visualization: %s", 
                 enable_visualization ? "enabled" : "disabled");
     
