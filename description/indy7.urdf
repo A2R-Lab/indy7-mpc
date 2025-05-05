@@ -187,7 +187,17 @@
       <inertia ixx="0.00078982" ixy="-3.4e-07" ixz="8.3e-07" iyy="0.00079764" iyz="-5.08e-06" izz="0.00058319"/>
     </inertial>
   </link>
-  <link name="tcp"/>
+  <link name="tcp">
+    <inertial>
+      <mass value="0.0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
+    </inertial>
+  </link>
+
+
+
+  
   <!-- joints -->
   <joint name="global" type="fixed">
     <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -240,8 +250,7 @@
   <joint name="tcp" type="fixed">
     <parent link="link6"/>
     <child link="tcp"/>
-    <!-- <origin xyz="0 0 0.06" rpy="0 0 0"/> -->
-    <origin rpy="0.0                         0.0                         0.0" xyz="0.0                          0.0                          0.06"/>
+    <origin xyz="0 0 0.06" rpy="0 0 0"/>
   </joint>
   <ros2_control name="indy" type="system">
     <hardware>
